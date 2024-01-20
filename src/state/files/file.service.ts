@@ -8,26 +8,6 @@ import { userStore } from "../user/user.store";
 export class FileService {
 	constructor(private store: FileStore, private userStore: UserStore) {}
 
-	async getFileCount() {
-		this.store.setLoading(true);
-		this.store.setError("");
-
-		try {
-			const res = await SendRequest<FileCount>("file-count", "GET");
-			if (res.status === 200){
-				this.store.update({
-					totalPages: Math.ceil((res.json?.num_count ?? 0.1) / 12),
-				});
-			} else {
-				this.store.setError(res.error);
-			}
-		} catch (e) {
-			this.store.setError(e.message);
-		}
-
-		this.store.setLoading(false);
-	}
-
 	async getFiles() {
 		this.store.setLoading(true);
 		this.store.setError("");
@@ -35,42 +15,69 @@ export class FileService {
 		const state: FileState = this.store.getValue();
 
 		try {
-			const res = await SendRequest<IFile[]>("files", "GET", undefined, [state.currentPage.toString()]);
-			if (res.status === 200){
+			const res = await SendRequest<IFile[]>("file/list", "GET", undefined);
+			if (!res.error){
 				this.store.update({
-					files: res.json,
+					files: res.data,
+					cursor: res.cursor,
 				});
 			} else {
 				this.store.setError(res.error);
 			}
-		} catch (e) {
+		} catch (e: any) {
 			this.store.setError(e.message);
 		}
 
 		this.store.setLoading(false);
 	}
 
-	async getNextPage() {
+	async loadMoreFiles() {
+		this.store.setLoading(true);
+		this.store.setError("");
+
 		const state: FileState = this.store.getValue();
-		if (state.currentPage >= state.totalPages){
-			return;
+
+		try {
+			const res = await SendRequest<IFile[]>(`file/list`, "GET", undefined, undefined, { cursor: state.cursor });
+			if (!res.error){
+				this.store.update({
+					files: [
+						...state.files ?? [],
+						...res.data ?? []
+					],
+					cursor: res.cursor,
+				});
+			} else {
+				this.store.setError(res.error);
+			}
+		} catch (e: any) {
+			this.store.setError(e.message);
 		}
-		this.store.update({
-			currentPage: state.currentPage + 1,
-		})
-		await this.getFiles();
+
+		this.store.setLoading(false);
 	}
 
-	async getPreviousPage() {
-		const state: FileState = this.store.getValue();
-		if (state.currentPage <= 1){
-			return;
-		}
-		this.store.update({
-			currentPage: state.currentPage - 1,
-		})
-		await this.getFiles();
-	}
+	// async getNextPage() {
+	// 	const state: FileState = this.store.getValue();
+	// 	if (state.currentPage >= state.totalPages){
+	// 		return;
+	// 	}
+	// 	this.store.update({
+	// 		currentPage: state.currentPage + 1,
+	// 	})
+	// 	await this.getFiles();
+	// }
+
+	// async getPreviousPage() {
+	// 	const state: FileState = this.store.getValue();
+	// 	if (state.currentPage <= 1){
+	// 		return;
+	// 	}
+	// 	this.store.update({
+	// 		currentPage: state.currentPage - 1,
+	// 	})
+	// 	await this.getFiles();
+	// }
 
 	async uploadFile(file: File) {
 		this.store.setLoading(true);
@@ -85,12 +92,12 @@ export class FileService {
 				formData.append("file", file);
 
 				res = await axios.post(
-					`${API_URL}/upload`,
+					`${API_URL}/file/upload`,
 					formData,
 					{ 
 						headers: {
 							"Content-Type": "multipart/form-data",
-							"Authorization": userState.api_key,
+							"Authorization": userState.apiToken,
 						},
 						onUploadProgress: (prog) => {
 							const percentage = Math.round(prog.loaded / prog.total * 100);
@@ -100,7 +107,7 @@ export class FileService {
 						}
 					}
 				);
-			} catch (err) {
+			} catch (err: any) {
 				const axErr: AxiosError = err;
 				if (axErr.response){
 					res = axErr.response;
@@ -119,7 +126,7 @@ export class FileService {
 			} else {
 				this.store.setError(res.data);
 			}
-		} catch (e) {
+		} catch (e: any) {
 			this.store.setError(e.message);
 		}
 

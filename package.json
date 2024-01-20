@@ -30,8 +30,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && cd build/ && npx copyfiles -a \"**\" ../../bin/debug/public/",
-    "production": "react-scripts build --production && cd build/ && npx copyfiles -a \"**\" ../../bin/release/public/",
+    "build": "react-scripts build && cd build/ && npx copyfiles -a \"**\" ../../tsuyu-api/public/",
+    "production": "react-scripts build --production && cd build/ && npx copyfiles -a \"**\" ../../tsuyu-api/public/",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

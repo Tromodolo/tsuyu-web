@@ -27,8 +27,8 @@ const Home = () => {
 
 	const downloadShareX = () => {
 		const template = {...shareXTemplate};
-		if (user?.api_key){
-			template.Headers.Authorization = user?.api_key ?? "";
+		if (user?.apiToken){
+			template.Headers.Authorization = user?.apiToken ?? "";
 		}
 		const blob = new Blob([JSON.stringify(template, null, 2)], {type : 'application/json'});
 		download(blob, "tsuyu.sxcu", "application/json");

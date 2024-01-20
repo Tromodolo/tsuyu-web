@@ -2,10 +2,10 @@ export interface User {
 	id: number;
 	username: string;
 	email: string;
-	is_admin: boolean;
-	api_key?: string;
-	last_update: Date;
-	created_at: Date;
+	isAdmin: boolean;
+	apiToken?: string;
+	lastUpdate: Date;
+	createdAt: Date;
 	message?: string;
 }
 
@@ -22,5 +22,5 @@ export interface UserLogin {
 
 export interface PasswordUpdate {
 	password: string;
-	new_password: string;
+	newPassword: string;
 }

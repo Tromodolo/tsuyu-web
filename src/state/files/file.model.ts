@@ -1,13 +1,13 @@
 export interface File {
 	id: number;
-	original_name: string;
+	originalName: string;
 	name: string;
-	filetype: string;
-	file_hash: string;
-	file_size: number;
-	uploaded_by: number;
-	uploaded_by_ip: string;
-	created_at: string;
+	fileType: string;
+	fileHash: string;
+	fileSizeInKB: number;
+	uploadedBy: number;
+	uploadedByIp: string;
+	createdAt: string;
 }
 
 export interface FileUpload {
@@ -22,7 +22,9 @@ export interface FileCount {
 export interface FileState {
 	currentPage: number;
 	totalPages: number;
-	files?: File[];
 	recentlyUploaded?: string[];
 	uploadProgress?: number;
+	files?: File[];
+	cursor?: string;
+	canLoadMore: boolean
 }

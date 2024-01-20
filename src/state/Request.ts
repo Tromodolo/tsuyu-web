@@ -8,31 +8,48 @@ userQuery.api_key.subscribe((api) => {
 });
 
 export interface ApiResponse<T> {
-	status: number;
-	json?: T;
-	error?: string;
+	data?: T;
+	error?: boolean;
+	errorMessage: string;
+	totalItems?: number;
+	cursor?: string;
 };
+
 export type Endpoint = 
-	| "upload"
+	| "file/upload"
 	| "settings"
-	| "delete"
-	| "files"
-	| "file-count"
-	| "login"
-	| "register"
-	| "reset-token"
-	| "change-password";
+	| "file/delete"
+	| "file/list"
+	| "user/login"
+	| "user/register"
+	| "user/reset-token"
+	| "user/change-password";
 export type Method = "GET" | "POST" | "PUT" | "DELETE";
+
 export async function SendRequest<T>(
 	endpoint: Endpoint,
 	method: Method,
 	body?: { [key: string]: any },
 	params?: [value: string],
+	queryParams?: { [key: string]: any },
 ): Promise<ApiResponse<T>> {
 	let url = `${API_URL}/${endpoint}`;
 	if (params !== undefined) {
 		for (const val of params) {
 			url += `/${val}`;
+		}
+	}
+
+	if (queryParams !== undefined) {
+		let first = true;
+		for (const key in queryParams) {
+			if (first) {
+				url += "?";
+			} else {
+				url += "&";
+			}
+			url += `${key}=${queryParams[key]}`;
+			first = false;
 		}
 	}
 
@@ -44,10 +61,10 @@ export async function SendRequest<T>(
 			data: body,
 			headers: {
 				"Content-Type": "application/json",
-				"Authorization": ApiKey ?? "",
+				"Authorization": `Bearer ${ApiKey ?? ""}`,
 			}
 		});
-	} catch (err) {
+	} catch (err: any) {
 		const axErr: AxiosError = err;
 		if (axErr.response){
 			res = axErr.response;
@@ -56,16 +73,5 @@ export async function SendRequest<T>(
 		}
 	}
 	
-	if (res.status === 200){
-		return {
-			status: 200,
-			json: res.data,
-		}
-	} else {
-		return {
-			status: res.status,
-			json: res.data,
-			error: res.data,
-		}
-	}
+	return res.data;
 }

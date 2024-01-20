@@ -10,8 +10,8 @@ export class SettingsService {
 		this.store.setError("");
 
 		const res = await SendRequest<Settings>("settings", "GET");
-		if (res.status === 200){
-			this.store.update({...res.json});
+		if (!res.error){
+			this.store.update({...res.data});
 		} else {
 			this.store.setError("Invalid username or password.");
 		}

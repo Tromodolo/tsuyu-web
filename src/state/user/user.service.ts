@@ -11,13 +11,14 @@ export class UserService {
 		this.store.update({message: undefined});
 
 		try{
-			const res = await SendRequest<User>("login", "POST", data);
-			if (res.status === 200){
-				this.store.update({...res.json});
+			const res = await SendRequest<User>("user/login", "POST", data);
+			if (!res.error){
+				console.log(res.data);
+				this.store.update({...res.data});
 			} else {
 				this.store.setError("Invalid username or password.");
 			}
-		} catch (e) {
+		} catch (e: any) {
 			this.store.setError(e.message);
 		}
 
@@ -29,13 +30,13 @@ export class UserService {
 		this.store.setError("");
 
 		try {
-			const res = await SendRequest<User>("register", "POST", data);
-			if (res.status === 200){
-				this.store.update({...res.json});
+			const res = await SendRequest<User>("user/register", "POST", data);
+			if (!res.error){
+				this.store.update({...res.data});
 			} else {
 				this.store.setError(res.error);
 			}
-		} catch (e) {
+		} catch (e: any) {
 			this.store.setError(e.message);
 		}
 
@@ -47,10 +48,10 @@ export class UserService {
 			id: undefined,
 			username: undefined,
 			email: undefined,
-			api_key: undefined,
-			is_admin: undefined,
-			last_update: undefined,
-			created_at: undefined,
+			apiToken: undefined,
+			isAdmin: undefined,
+			lastUpdate: undefined,
+			createdAt: undefined,
 			message: undefined,
 		});
 	}
@@ -62,15 +63,15 @@ export class UserService {
 		const state = this.store.getValue();
 
 		try{
-			const res = await SendRequest<PasswordUpdate>("change-password", "POST", data, [state.id.toString()]);
-			if (res.status === 200){
+			const res = await SendRequest<PasswordUpdate>("user/change-password", "POST", data);
+			if (!res.error){
 				this.store.update({
 					message: "Successfully updated password",
 				});
 			} else {
 				this.store.setError(res.error);
 			}
-		} catch (e) {
+		} catch (e: any) {
 			this.store.setError(e.message);
 		}
 

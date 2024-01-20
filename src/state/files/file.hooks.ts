@@ -24,7 +24,6 @@ export const useFileState = (): {
 
 	useEffect(() => {
 		if (isLoggedIn){
-			fileService.getFileCount();
 			fileService.getFiles();
 		}
 

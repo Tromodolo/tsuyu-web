@@ -25,14 +25,35 @@ const Dashboard = () => {
 	}
 
 	const copyTokenToClipboard = () => {
-		navigator.clipboard.writeText(user?.api_key ?? "");
+		navigator.clipboard.writeText(user?.apiToken ?? "");
 	}
 
 	const updatePassword = () => {
 		userService.changePassword({
 			password: oldPassword,
-			new_password: newPassword,
+			newPassword: newPassword,
 		});
+	}
+	
+	const renderImage = (x: File) => {
+		if (x.name.includes(".png") || x.name.includes(".jpg") || 
+			x.name.includes(".gif") || x.name.includes(".jpeg") ||
+			x.name.includes(".webp")) {
+			const url = `${API_URL}/${x.name}`;
+			return (
+				<div className="row-name">
+					<img className="row-image" src={url} />
+				</div>
+			)
+		} else {
+			return (
+				<div className="row-name"></div>
+			)
+		}
+	}
+
+	const loadMore = () => {
+		fileService.loadMoreFiles();
 	}
 
 	const content = () => {
@@ -48,38 +69,39 @@ const Dashboard = () => {
 						<>
 							<section className="file-table">
 								<div className="table-header">
+									<span className="header-name">Preview</span>
 									<span className="header-name">Original file name</span>
 									<span className="header-size">Size</span>
 									<span className="header-date">Date uploaded</span>
 									<span className="header-link">Link</span>
+									<span className="header-link">Delete?</span>
 								</div>
 								<div className="table-content">
 									{files.map((x) => {
 										return (
 											<div className="table-row" key={x.id}>
+												{renderImage(x)}
 												<div className="row-name">
-													{x.original_name}
+													{x.originalName}
 												</div>
 												<div className="row-size">
-													<span>{x.file_size > 1000 ? `${(x.file_size / 1000).toFixed(2)} MB` : `${x.file_size} KB`}</span>
+													<span>{x.fileSizeInKB > 1000 ? `${(x.fileSizeInKB / 1000).toFixed(2)} MB` : `${x.fileSizeInKB} KB`}</span>
 												</div>
 												<div className="row-date">
-													<span>{format(new Date(x.created_at), "dd MMM HH:mm aaa")}</span>
+													<span>{format(new Date(x.createdAt), "dd MMM HH:mm aaa")}</span>
 												</div>
 												<Button className="row-link" small={true} transparent={true} text={"Copy"} onClick={() => copyUrlToClipboard(x)}/>
+												<Button className="row-delete" small={true} transparent={true} text={"Delete"} onClick={() => copyUrlToClipboard(x)}/>
 											</div>
 										)
 									})}
 								</div>
 							</section>
 							<div className="table-nav">
-								<button className={currentPage <= 1 ? "disabled" : ""} disabled={currentPage <= 1 } onClick={() => fileService.getPreviousPage()}>
-									<FaArrowLeft color={currentPage <= 1 ? "#5B5C5E" : "#DAE1E7"} size={18} />
-								</button>
-								Page {currentPage}/{totalPages}
-								<button className={currentPage >= totalPages ? "disabled" : ""} disabled={currentPage >= totalPages} onClick={() => fileService.getNextPage()}>
-									<FaArrowRight color={currentPage >= totalPages ? "#5B5C5E" : "#DAE1E7"} size={18} />
-								</button>
+								<Button 
+									text={"Load more"}
+									className="load-more-button" 
+									onClick={loadMore} />
 							</div>
 						</>
 						)}
@@ -91,7 +113,7 @@ const Dashboard = () => {
 						<Input disabled={true} id={"username"} placeholder={user?.username} label={"Username"}/>
 						<Input disabled={true} id={"email"} placeholder={user?.email ?? ""} label={"Email"}/>
 						<div className="token-input">
-							<Input disabled={true} id={"token"} placeholder={user?.api_key} label={"Api Token"}/>
+							<Input disabled={true} id={"token"} placeholder={user?.apiToken} label={"Api Token"}/>
 							<Button text={"Copy"} className="token-copy" onClick={() => copyTokenToClipboard()}/>
 						</div>
 						<form className="password-update" onSubmit={() => updatePassword()}>

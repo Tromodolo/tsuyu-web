@@ -5,6 +5,7 @@ const CreateInitialState = (): FileState => ({
 	currentPage: 1,
 	totalPages: 1,
 	files: [],
+	canLoadMore: false
 });
 
 @StoreConfig({
