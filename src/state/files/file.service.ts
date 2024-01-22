@@ -97,7 +97,7 @@ export class FileService {
 					{ 
 						headers: {
 							"Content-Type": "multipart/form-data",
-							"Authorization": userState.apiToken,
+							"Authorization": `Bearer ${userState.apiToken}`,
 						},
 						onUploadProgress: (prog) => {
 							const percentage = Math.round(prog.loaded / prog.total * 100);
