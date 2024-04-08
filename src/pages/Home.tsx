@@ -83,11 +83,11 @@ const Home = () => {
 				<section className="info">
 					<h1 className="title">tsuyu</h1>
 					<h3 className="subtitle">ツユ</h3>
-					<p className="description">
-						File uploading service lovingly crafted using Rust.
+					{/* <p className="description"> */}
+						{/* File uploading service lovingly crafted using Rust. */}
 						{/* <br />						
 						Fast uploads, sharing and file history, but more to come. */}
-					</p>
+					{/* </p> */}
 				</section>
 				<section className="interactions">
 					{upload()}
